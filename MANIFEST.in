@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include khozama *.css
+recursive-include khozama *.csv
+recursive-include khozama *.html
+recursive-include khozama *.ico
+recursive-include khozama *.js
+recursive-include khozama *.json
+recursive-include khozama *.md
+recursive-include khozama *.png
+recursive-include khozama *.py
+recursive-include khozama *.svg
+recursive-include khozama *.txt
+recursive-exclude khozama *.pyc
