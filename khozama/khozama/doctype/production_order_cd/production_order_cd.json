@@ -1,0 +1,169 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-03-03 08:52:49.585153",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "production_date",
+  "column_break_ebukz",
+  "so_reference",
+  "section_break_b11ad",
+  "item_code",
+  "item_name",
+  "height_cf",
+  "width_cf",
+  "area_cf",
+  "area_for_calculation_cf",
+  "column_break_epcmj",
+  "no_of_pcs_cf",
+  "qty",
+  "serial_no",
+  "remaining_serial_no_count",
+  "section_break_butgo",
+  "consumable_items"
+ ],
+ "fields": [
+  {
+   "default": "POCD-.#",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "naming_series",
+   "options": "POCD-.#"
+  },
+  {
+   "fieldname": "production_date",
+   "fieldtype": "Date",
+   "label": "Production Date"
+  },
+  {
+   "fieldname": "column_break_ebukz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "so_reference",
+   "fieldtype": "Link",
+   "label": "SO Reference",
+   "options": "Sales Order",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_b11ad",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "height_cf",
+   "fieldtype": "Int",
+   "label": "Height",
+   "read_only": 1
+  },
+  {
+   "fieldname": "width_cf",
+   "fieldtype": "Int",
+   "label": "Width",
+   "read_only": 1
+  },
+  {
+   "fieldname": "area_cf",
+   "fieldtype": "Float",
+   "label": "Area",
+   "read_only": 1
+  },
+  {
+   "fieldname": "area_for_calculation_cf",
+   "fieldtype": "Float",
+   "label": "Area For Calculation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "no_of_pcs_cf",
+   "fieldtype": "Int",
+   "label": "No of Pcs",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_epcmj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "label": "Total Area (Qty)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "serial_no",
+   "fieldtype": "Small Text",
+   "label": "Serial No"
+  },
+  {
+   "description": "No. of items left for serial no creation",
+   "fieldname": "remaining_serial_no_count",
+   "fieldtype": "Int",
+   "label": "Remaining",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_butgo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "consumable_items",
+   "fieldtype": "Table",
+   "label": "Consumable Items",
+   "options": "Production Order Consumable Item CT"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "Serial No",
+   "link_fieldname": "production_order_cf"
+  },
+  {
+   "group": "Reference",
+   "link_doctype": "Stock Entry",
+   "link_fieldname": "production_order_cf",
+   "table_fieldname": "items"
+  }
+ ],
+ "modified": "2023-03-11 08:34:23.797292",
+ "modified_by": "Administrator",
+ "module": "Khozama",
+ "name": "Production Order CD",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

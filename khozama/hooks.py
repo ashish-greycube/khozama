@@ -105,7 +105,12 @@ doctype_js = {
 #		"on_trash": "method"
 #	}
 # }
-
+doc_events = {
+	"Stock Entry": {
+		"on_submit": "khozama.khozama.doctype.production_order_cd.production_order_cd.update_production_order",
+		"on_cancel": "khozama.khozama.doctype.production_order_cd.production_order_cd.update_production_order",
+	},
+}
 # Scheduled Tasks
 # ---------------
 
