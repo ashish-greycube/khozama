@@ -1,0 +1,68 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-09 14:33:04.363358",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "dispatch_for_serial_no",
+  "target_warehouse",
+  "date",
+  "scan_barcode"
+ ],
+ "fields": [
+  {
+   "depends_on": "eval: (doc.target_warehouse && doc.date)",
+   "fieldname": "scan_barcode",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Serial No Barcode",
+   "options": "Barcode",
+   "reqd": 1
+  },
+  {
+   "fieldname": "target_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Target Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "dispatch_for_serial_no",
+   "fieldtype": "Heading",
+   "label": "Dispatch for Serial No"
+  },
+  {
+   "default": "Today",
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-03-14 14:00:25.100368",
+ "modified_by": "Administrator",
+ "module": "Khozama",
+ "name": "Dispatch CD",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

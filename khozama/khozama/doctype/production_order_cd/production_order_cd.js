@@ -2,8 +2,24 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Production Order CD', {
+	onload:function(frm) {
+		frm.set_query('item_code', 'consumable_items', () => {
+			return {
+				filters: {
+					is_stock_item: 1
+				}
+			}
+		})	
+		frm.set_query('warehouse', 'consumable_items', () => {
+			return {
+				filters: {
+					company: frm.doc.company
+				}
+			}
+		})				
+	},
     refresh: function (frm) {
-		if (frm.doc.docstatus == 0 && frm.is_new()==undefined) {
+		if (frm.doc.docstatus == 0 && frm.is_new()==undefined && !frm.is_dirty()) {
 			frm.add_custom_button(__("Material Issue"),() => {
                 frm.trigger('make_material_issue_dialog')
             }
@@ -21,7 +37,9 @@ frappe.ui.form.on('Production Order CD', {
 					'planned_qty':d.planned_qty,
 					'issued_qty':d.issued_qty,
 					'item_hexcode':d.name,
-					'to_consume_qty':d.to_consume_qty
+					'to_consume_qty':d.to_consume_qty,
+					'original_consume_qty':d.to_consume_qty,
+					'warehouse':d.warehouse
 				}; 			
 			}
 		});
@@ -51,10 +69,10 @@ frappe.ui.form.on('Production Order CD', {
 						},
 						{
 							fieldtype:'Int',
-							fieldname:'consumption_qty',
-							label: __('Quantity'),
+							fieldname:'to_consume_qty',
+							label: __('To Consume qty'),
 							in_list_view:1
-						},
+						},						
 					],
 					data: consumable_items,
 					get_data: () => {
@@ -95,6 +113,14 @@ frappe.ui.form.on('Production Order CD', {
 								indicator: 'red'
 							});	
 						}	
+						if (row.to_consume_qty > row.original_consume_qty){
+							frappe.throw({
+								title: __(" New To Consume qty is greater"),
+								message: __('Item Code: {0} has new <b>to consume qty : {1} </b>, It should be less than or equal to {2}', [row.item_code, row.to_consume_qty,row.original_consume_qty]),
+								indicator: 'red'
+							});	
+						}
+
 						row.to_consume_qty=row.consumption_qty-row.issued_qty		
 						if (row.to_consume_qty <= 0){
 							frappe.throw({

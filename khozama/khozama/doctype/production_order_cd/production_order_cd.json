@@ -11,6 +11,7 @@
   "production_date",
   "column_break_ebukz",
   "so_reference",
+  "company",
   "section_break_b11ad",
   "item_code",
   "item_name",
@@ -129,6 +130,12 @@
    "fieldtype": "Table",
    "label": "Consumable Items",
    "options": "Production Order Consumable Item CT"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -145,7 +152,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2023-03-11 08:34:23.797292",
+ "modified": "2023-03-14 06:39:16.987217",
  "modified_by": "Administrator",
  "module": "Khozama",
  "name": "Production Order CD",

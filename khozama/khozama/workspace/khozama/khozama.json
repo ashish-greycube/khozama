@@ -71,14 +71,14 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Khozama Settings",
-   "link_to": "Khozama Settings",
+   "label": "Dispatch",
+   "link_to": "Dispatch CD",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
   }
  ],
- "modified": "2023-03-11 07:29:29.905716",
+ "modified": "2023-03-14 07:59:24.700859",
  "modified_by": "Administrator",
  "module": "Khozama",
  "name": "Khozama",

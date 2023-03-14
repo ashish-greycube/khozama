@@ -4,5 +4,5 @@
 # import frappe
 import unittest
 
-class TestKhozamaSettings(unittest.TestCase):
+class TestDispatchCD(unittest.TestCase):
 	pass

@@ -37,9 +37,21 @@ class ProductionOrderCD(Document):
 		self.validate_consumption_logic()
 
 	def validate_consumption_logic(self):
+		unique_items = set()
 		# consumption logic
 		for item in self.consumable_items:
-			if item.consumption_qty < item.planned_qty:
+			# consumption item should be unique
+			if item.item_code in unique_items:
+				frappe.throw(_("Item {0} already exists in the consumption child table.").format(item.item_code))
+			else:
+				unique_items.add(item.item_code)
+
+			if item.planned_qty==0 and item.consumption_qty==0:
+				frappe.throw(_("Item Code: {0} has consumption qty {1}, It should be greater than zero.".format(item.item_code,item.consumption_qty)))	
+			if item.planned_qty==0:
+				item.issued_qty=0
+				item.to_consume_qty=item.consumption_qty
+			if item.planned_qty and item.consumption_qty < item.planned_qty:
 				frappe.throw(_("Item Code: {0} has consumption qty {1}, which is less than planned qty {2}.".format(item.item_code,item.consumption_qty,item.planned_qty)))
 			if item.consumption_qty < item.issued_qty:
 				frappe.throw(_("Item Code: {0} has consumption qty {1}, which is less than issued qty {2}.".format(item.item_code,item.consumption_qty,item.issued_qty)))	
@@ -68,6 +80,7 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 	def set_missing_values(source, target):
 		if source.get('items'):
 			for item in source.get('items'):
+				target.company=source.company
 				target.production_date=getdate(nowdate())
 				target.so_reference=source.name
 				target.item_code=item.item_code
@@ -144,7 +157,6 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 def make_material_issue_stock_entry(consumable_items,production_order):
 	print('-'*10)
 	print('consumable_items',consumable_items)
-	default_source_warehouse = frappe.db.get_single_value('Khozama Settings', 'default_source_warehouse')
 
 	consumable_items_list = consumable_items
 
@@ -153,60 +165,33 @@ def make_material_issue_stock_entry(consumable_items,production_order):
 	elif not consumable_items:
 		frappe.throw(_("No Items available for transfer"))
 
-	# if rm_items_list:
-	# 	fg_items = list(set(d["item_code"] for d in rm_items_list))
-	# else:
-	# 	frappe.throw(_("No Items selected for transfer"))
-
-	# if purchase_order:
-	# 	purchase_order = frappe.get_doc("Purchase Order", purchase_order)
-
-	# if fg_items:
-	# 	items = tuple(set(d["rm_item_code"] for d in rm_items_list))
-	# 	item_wh = get_item_details(items)
-
 	stock_entry = frappe.new_doc("Stock Entry")
 	stock_entry.purpose = 'Material Issue'
 	stock_entry.stock_entry_type='Material Issue'
-
-	stock_entry.from_warehouse = default_source_warehouse
+	stock_entry.company=frappe.db.get_value('Production Order CD', production_order, 'company')
 	stock_entry.set_stock_entry_type()
-
-
-
 	for rm_item_data in consumable_items_list:
-		# if rm_item_data["item_code"] == item_code:
-		# 	rm_item_code = rm_item_data["rm_item_code"]
+		if rm_item_data["to_consume_qty"]>rm_item_data["original_consume_qty"]:
+			frappe.db.set_value('Production Order Consumable Item CT',rm_item_data["production_order_consumable_hex_cf"], 'to_consume_qty', rm_item_data["to_consume_qty"])
+			frappe.msgprint(_("Item {1} is updated with new to consume qty {1}")
+			.format(rm_item_data.get("item_code"),rm_item_data["to_consume_qty"]))			
 		details = frappe.db.get_value("Item", rm_item_data.get("item_code"), ["stock_uom", "name"], as_dict=1)
 		items_dict = {
-			# rm_item_code: {
 			"item_code": rm_item_data.get("item_code"),
-			# "item_name": rm_item_data["item_name"],
-			# "description": item_wh.get(rm_item_code, {}).get("description", ""),
 			"qty": rm_item_data["to_consume_qty"],
-			"from_warehouse": default_source_warehouse,
+			"s_warehouse": rm_item_data.get("warehouse"),
 			"stock_uom": details.stock_uom,
 			"conversion_factor":get_conversion_factor(rm_item_data.get("item_code"), details.stock_uom).get("conversion_factor") or 1.0,
 			"production_order_cf":production_order,
 			"production_order_consumable_hex_cf":rm_item_data.get("item_hexcode"),
-			# "serial_no": rm_item_data.get("serial_no"),
-			# "batch_no": rm_item_data.get("batch_no"),
-			# "main_item_code": rm_item_data["item_code"],
-			# "allow_alternative_item": item_wh.get(rm_item_code, {}).get("allow_alternative_item"),
-			# }
-		}
-		stock_entry.append('items',items_dict)
-		# stock_entry.add_to_stock_entry_detail(items_dict)
 
+		}
+		print('items_dict',items_dict)
+		stock_entry.append('items',items_dict)
 	stock_entry.set_missing_values()
 	stock_entry.flags.ignore_permissions = True
 	stock_entry.save()
 	return stock_entry.name
-	# else:
-	# 	frappe.throw(_("No Items selected for transfer"))
-	# return purchase_order.name
-
-
 
 def update_production_order(self,method):
 	if method=='on_submit':
@@ -219,8 +204,11 @@ def update_production_order(self,method):
 				for se_detail in se_details:
 					if se_detail.qty:
 						total_issued_qty=total_issued_qty+se_detail.qty
+				consumption_qty=frappe.db.get_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'consumption_qty')
 				frappe.db.set_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'issued_qty', total_issued_qty)
-				frappe.msgprint(_("Production Order {0} is updated for item {1} with issued qty {2}.")
+				to_consume_qty=consumption_qty-total_issued_qty
+				frappe.db.set_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'to_consume_qty', to_consume_qty)
+				frappe.msgprint(_("Production Order {0} is updated for item {1} with issued qty {2}. Also, consumption and to consume qty are updated.")
 			.format(get_link_to_form('Production Order CD',se_details[0].get("production_order_cf")), item.item_code,total_issued_qty),alert=True)		
 				
 	if method=='on_cancel':
@@ -231,8 +219,10 @@ def update_production_order(self,method):
 				total_issued_qty=issued_qty-item.qty
 				production_order_cf=item.production_order_cf
 				frappe.db.set_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'issued_qty', total_issued_qty)
-				frappe.db.set_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'issued_qty', total_issued_qty)
-				frappe.msgprint(_("Production Order {0} is updated for item {1} with issued qty {2}.")
+				consumption_qty=frappe.db.get_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'consumption_qty')
+				to_consume_qty=consumption_qty-total_issued_qty
+				frappe.db.set_value('Production Order Consumable Item CT',item.production_order_consumable_hex_cf, 'to_consume_qty', to_consume_qty)
+				frappe.msgprint(_("Production Order {0} is updated for item {1} with issued qty {2}. Also, consumption and to consume qty are updated.")
 			.format(get_link_to_form('Production Order CD',production_order_cf), item.item_code,total_issued_qty),alert=True)		
 				frappe.db.set_value('Stock Entry Detail', item.name, 'production_order_consumable_hex_cf', None)
 				frappe.db.set_value('Stock Entry Detail', item.name, 'production_order_cf', None)
