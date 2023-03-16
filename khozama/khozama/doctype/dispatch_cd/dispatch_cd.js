@@ -20,6 +20,11 @@ frappe.ui.form.on('Dispatch CD', {
 		}
 	},
 	scan_barcode: function(frm) {
+		if((frm.doc.scan_barcode) &&(!frm.doc.date || !frm.doc.target_warehouse)) {
+			frm.set_value('scan_barcode', '')		
+			frappe.throw(__('Please enter warehouse and date before scanning.'))
+			return;		
+		}
 
 		if(frm.doc.scan_barcode) {
 			frappe.call({

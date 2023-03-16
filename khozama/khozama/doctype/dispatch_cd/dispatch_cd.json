@@ -13,7 +13,6 @@
  ],
  "fields": [
   {
-   "depends_on": "eval: (doc.target_warehouse && doc.date)",
    "fieldname": "scan_barcode",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -46,7 +45,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2023-03-16 14:33:33.334848",
+ "modified": "2023-03-16 15:02:51.465270",
  "modified_by": "Administrator",
  "module": "Khozama",
  "name": "Dispatch CD",
