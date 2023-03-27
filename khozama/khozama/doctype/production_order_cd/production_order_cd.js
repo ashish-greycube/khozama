@@ -16,7 +16,15 @@ frappe.ui.form.on('Production Order CD', {
 					company: frm.doc.company
 				}
 			}
-		})				
+		})	
+		frm.set_query('finished_item_code', 'consumable_items', () => {
+			return {
+				filters: {
+					has_serial_no: 1,
+					is_stock_item:1
+				}
+			}
+		})					
 	},
     refresh: function (frm) {
 		if (frm.doc.docstatus == 0 && frm.is_new()==undefined && !frm.is_dirty()) {

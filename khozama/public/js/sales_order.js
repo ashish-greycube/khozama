@@ -1,7 +1,6 @@
 frappe.ui.form.on("Sales Order", {
     refresh: function (frm) {
-        debugger
-		if (frm.doc.docstatus == 1 && frm.is_new()==undefined && frm.doc.items && frm.doc.items.length==1) {
+		if (frm.doc.docstatus == 1 && frm.is_new()==undefined && frm.doc.items && frm.doc.items.length>0) {
 			frm.add_custom_button(__("Production Order"),() => {
                 make_production_order(frm)
             }

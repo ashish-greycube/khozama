@@ -12,39 +12,51 @@ from erpnext.stock.get_item_details import get_conversion_factor
 
 class ProductionOrderCD(Document):
 	def validate(self):
-		#  check has_serial_no=1 and is_stock_item=1
-		has_serial_no, is_stock_item = frappe.db.get_value('Item',self.item_code, ['has_serial_no', 'is_stock_item'])
-		if has_serial_no==0:
-			frappe.throw(_("Item should be a serialzied item. 'Has Serial No' = 1."))
-		if is_stock_item==0:
-			frappe.throw(_("Item should be a stock item. 'Maintain Stock' = 1."))
-		#  serial_no creation logic
-		if self.serial_no:
-			serial_nos=get_serial_nos(self.serial_no)
-			print('serial_nos',serial_nos)
-			if len(serial_nos)>0:	
-				for serial_no in serial_nos:
-					serial_no_doc=frappe.db.exists('Serial No',serial_no, cache=True)
-					print('serial_no_doc',serial_no_doc)
-					if serial_no_doc:
-						# serial no is already created
-						pass
-					else:
-						self.create_serial_no(serial_no)
-		# remaining serial_nos to create
-		self.remaining_serial_no_count=self.qty-len(get_serial_nos(self.serial_no))
+		for finished_item in self.get('finished_items'):
+			#  check has_serial_no=1 and is_stock_item=1
+			has_serial_no, is_stock_item = frappe.db.get_value('Item',finished_item.item_code, ['has_serial_no', 'is_stock_item'])
+			if has_serial_no==0:
+				frappe.throw(_("Finished Item {0} should be a serialzied item. 'Has Serial No' = 1.".format(finished_item.item_code)))
+			if is_stock_item==0:
+				frappe.throw(_("Finished Item {0}  should be a stock item. 'Maintain Stock' = 1.".format(finished_item.item_code)))
+			#  serial_no creation logic
+			if finished_item.serial_no:
+				serial_nos=get_serial_nos(finished_item.serial_no)
+				print('serial_nos',serial_nos)
+				if len(serial_nos)>0:	
+					for serial_no in serial_nos:
+						serial_no_doc=frappe.db.exists('Serial No',serial_no, cache=True)
+						print('serial_no_doc',serial_no_doc)
+						if serial_no_doc:
+							# serial no is already created
+							pass
+						else:
+							self.create_serial_no(finished_item,serial_no)
+			# remaining serial_nos to create
+			finished_item.remaining_serial_no_count=finished_item.qty-len(get_serial_nos(finished_item.serial_no))
 
 		self.validate_consumption_logic()
 
 	def validate_consumption_logic(self):
-		unique_items = set()
+		# no duplicate finished items
+		list_of_finished_items=[]
+		for finished_item in self.get('finished_items'):
+			if finished_item.item_code in list_of_finished_items:
+				frappe.throw(_("Duplicate Finished Item {0}.").format(item.finished_item_code))
+			else:
+				list_of_finished_items.append(finished_item.item_code)
+
+		unique_items = []
 		# consumption logic
 		for item in self.consumable_items:
-			# consumption item should be unique
-			if item.item_code in unique_items:
-				frappe.throw(_("Item {0} already exists in the consumption child table.").format(item.item_code))
+			# finished item in consumable should be part of finished item child table
+			if item.finished_item_code not in list_of_finished_items:
+				frappe.throw(_("For consumed item #{0}:{1} the finished Item {2} doesnot exist in finished item table.").format(item.idx,item.item_code,item.finished_item_code))
+			# consumption item for a finished item should be unique
+			if [item.item_code,item.finished_item_code] in unique_items:
+				frappe.throw(_("Item {0} for finished item {1} already exists in the consumption child table.").format(item.item_code,item.finished_item_code))
 			else:
-				unique_items.add(item.item_code)
+				unique_items.append([item.item_code,item.finished_item_code])
 
 			if item.planned_qty==0 and item.consumption_qty==0:
 				frappe.throw(_("Item Code: {0} has consumption qty {1}, It should be greater than zero.".format(item.item_code,item.consumption_qty)))	
@@ -59,11 +71,11 @@ class ProductionOrderCD(Document):
 
 
 
-	def create_serial_no(self,serial_no):
+	def create_serial_no(self,finished_item,serial_no):
 		serial_no_doc=frappe.new_doc('Serial No')	
 		serial_no_doc.serial_no=serial_no
-		serial_no_doc.item_code=self.item_code
-		serial_no_doc.production_order_cf=self.name
+		serial_no_doc.item_code=finished_item.item_code
+		serial_no_doc.production_order_cf=finished_item.name
 		serial_no_doc.run_method("set_missing_values")
 		
 		# serial_no_doc.flags.ignore_validate = True					
@@ -83,15 +95,16 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 				target.company=source.company
 				target.production_date=getdate(nowdate())
 				target.so_reference=source.name
-				target.item_code=item.item_code
-				target.item_name=item.item_name
-				target.height_cf=item.height_cf
-				target.width_cf=item.width_cf
-				target.area_cf=item.area_cf
-				target.area_for_calculation_cf=item.area_for_calculation_cf
-				target.no_of_pcs_cf=item.no_of_pcs_cf
-				target.qty=item.qty
-				target.remaining_serial_no_count=item.qty
+
+				# target.item_code=item.item_code
+				# target.item_name=item.item_name
+				# target.height_cf=item.height_cf
+				# target.width_cf=item.width_cf
+				# target.area_cf=item.area_cf
+				# target.area_for_calculation_cf=item.area_for_calculation_cf
+				# target.no_of_pcs_cf=item.no_of_pcs_cf
+				# target.qty=item.qty
+				# target.remaining_serial_no_count=item.qty
 
 				if item.consumable_item_code_1:
 					target.append('consumable_items',{
@@ -100,7 +113,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'planned_qty':item.consumable_planned_qty_1,
 						'consumption_qty':item.consumable_planned_qty_1,
 						'issued_qty':0,
-						'to_consume_qty':item.consumable_planned_qty_1
+						'to_consume_qty':item.consumable_planned_qty_1,
+						'finished_item_code':item.item_code
 
 					})
 				
@@ -111,7 +125,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'planned_qty':item.consumable_planned_qty_2,
 						'consumption_qty':item.consumable_planned_qty_2,
 						'issued_qty':0,
-						'to_consume_qty':item.consumable_planned_qty_2						
+						'to_consume_qty':item.consumable_planned_qty_2,
+						'finished_item_code':item.item_code			
 					})
 
 				if item.consumable_item_code_3:
@@ -121,7 +136,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'planned_qty':item.consumable_planned_qty_3,
 						'consumption_qty':item.consumable_planned_qty_3,
 						'issued_qty':0,
-						'to_consume_qty':item.consumable_planned_qty_3							
+						'to_consume_qty':item.consumable_planned_qty_3,
+						'finished_item_code':item.item_code					
 					})
 
 				if item.consumable_item_code_4:
@@ -131,7 +147,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'planned_qty':item.consumable_planned_qty_4,
 						'consumption_qty':item.consumable_planned_qty_4,
 						'issued_qty':0,
-						'to_consume_qty':item.consumable_planned_qty_4							
+						'to_consume_qty':item.consumable_planned_qty_4,
+						'finished_item_code':item.item_code					
 					})										
 
 
@@ -146,6 +163,21 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 		source_name,
 		{
 			"Sales Order": {"doctype": "Production Order CD", "validation": {"docstatus": ["=", 1]}},
+			"Sales Order Item": {
+				"doctype": "Production Order Finished Item CT",
+				"field_map": {
+					"item_code": "item_code",
+					"item_name": "item_name",
+					"height_cf": "height_cf",
+					"width_cf":"width_cf",
+					"area_cf":"area_cf",
+					"area_for_calculation_cf":"area_for_calculation_cf",
+					"no_of_pcs_cf":"no_of_pcs_cf",
+					"qty":"qty",
+					"qty":"remaining_serial_no_count"
+				},
+			"postprocess": update_item,
+		},
 		},
 		target_doc,
 		set_missing_values,

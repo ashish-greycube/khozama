@@ -1,0 +1,112 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-03-27 15:47:32.389834",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "height_cf",
+  "width_cf",
+  "area_cf",
+  "area_for_calculation_cf",
+  "column_break_pkrlo",
+  "no_of_pcs_cf",
+  "qty",
+  "serial_no",
+  "remaining_serial_no_count"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "height_cf",
+   "fieldtype": "Int",
+   "label": "Height",
+   "read_only": 1
+  },
+  {
+   "fieldname": "width_cf",
+   "fieldtype": "Int",
+   "label": "Width",
+   "read_only": 1
+  },
+  {
+   "fieldname": "area_cf",
+   "fieldtype": "Float",
+   "label": "Area",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "area_for_calculation_cf",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Area For Calculation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_pkrlo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "no_of_pcs_cf",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "No of Pcs",
+   "read_only": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Area (Qty)",
+   "read_only": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "serial_no",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Serial No"
+  },
+  {
+   "columns": 1,
+   "description": "No. of items left for serial no creation",
+   "fieldname": "remaining_serial_no_count",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Remaining",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2023-03-27 17:15:51.719653",
+ "modified_by": "Administrator",
+ "module": "Khozama",
+ "name": "Production Order Finished Item CT",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

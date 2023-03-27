@@ -12,7 +12,8 @@
   "planned_qty",
   "consumption_qty",
   "issued_qty",
-  "to_consume_qty"
+  "to_consume_qty",
+  "finished_item_code"
  ],
  "fields": [
   {
@@ -75,12 +76,19 @@
    "label": "Warehouse",
    "options": "Warehouse",
    "reqd": 1
+  },
+  {
+   "fieldname": "finished_item_code",
+   "fieldtype": "Link",
+   "label": "Finished Item Code",
+   "options": "Item",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-03-14 12:46:52.191505",
+ "modified": "2023-03-27 17:31:56.938949",
  "modified_by": "Administrator",
  "module": "Khozama",
  "name": "Production Order Consumable Item CT",

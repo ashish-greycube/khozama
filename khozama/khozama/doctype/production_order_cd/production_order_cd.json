@@ -13,17 +13,7 @@
   "so_reference",
   "company",
   "section_break_b11ad",
-  "item_code",
-  "item_name",
-  "height_cf",
-  "width_cf",
-  "area_cf",
-  "area_for_calculation_cf",
-  "column_break_epcmj",
-  "no_of_pcs_cf",
-  "qty",
-  "serial_no",
-  "remaining_serial_no_count",
+  "finished_items",
   "section_break_butgo",
   "consumable_items"
  ],
@@ -57,71 +47,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "item_code",
-   "fieldtype": "Link",
-   "label": "Item Code",
-   "options": "Item",
-   "read_only": 1
-  },
-  {
-   "fieldname": "item_name",
-   "fieldtype": "Data",
-   "label": "Item Name",
-   "read_only": 1
-  },
-  {
-   "fieldname": "height_cf",
-   "fieldtype": "Int",
-   "label": "Height",
-   "read_only": 1
-  },
-  {
-   "fieldname": "width_cf",
-   "fieldtype": "Int",
-   "label": "Width",
-   "read_only": 1
-  },
-  {
-   "fieldname": "area_cf",
-   "fieldtype": "Float",
-   "label": "Area",
-   "read_only": 1
-  },
-  {
-   "fieldname": "area_for_calculation_cf",
-   "fieldtype": "Float",
-   "label": "Area For Calculation",
-   "read_only": 1
-  },
-  {
-   "fieldname": "no_of_pcs_cf",
-   "fieldtype": "Int",
-   "label": "No of Pcs",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_epcmj",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "qty",
-   "fieldtype": "Float",
-   "label": "Total Area (Qty)",
-   "read_only": 1
-  },
-  {
-   "fieldname": "serial_no",
-   "fieldtype": "Small Text",
-   "label": "Serial No"
-  },
-  {
-   "description": "No. of items left for serial no creation",
-   "fieldname": "remaining_serial_no_count",
-   "fieldtype": "Int",
-   "label": "Remaining",
-   "read_only": 1
-  },
-  {
    "fieldname": "section_break_butgo",
    "fieldtype": "Section Break"
   },
@@ -136,6 +61,12 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "fieldname": "finished_items",
+   "fieldtype": "Table",
+   "label": "Finished Items",
+   "options": "Production Order Finished Item CT"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -152,7 +83,7 @@
    "table_fieldname": "items"
   }
  ],
- "modified": "2023-03-14 06:39:16.987217",
+ "modified": "2023-03-27 17:31:32.091548",
  "modified_by": "Administrator",
  "module": "Khozama",
  "name": "Production Order CD",
