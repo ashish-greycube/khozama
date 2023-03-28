@@ -14,6 +14,7 @@ def make_material_receipt(serial_no,item_code,target_warehouse,posting_date,subm
 	details = frappe.db.get_value("Item", item_code, ["stock_uom", "name"], as_dict=1)
 	stock_entry = frappe.new_doc("Stock Entry")
 	stock_entry.stock_entry_type = "Material Receipt"
+	stock_entry.purpose="Material Receipt"
 	stock_entry.to_warehouse = target_warehouse
 	stock_entry.company =  frappe.db.get_value('Warehouse', target_warehouse, 'company')
 
@@ -23,6 +24,7 @@ def make_material_receipt(serial_no,item_code,target_warehouse,posting_date,subm
 	se_child.qty = flt(1.0)
 	se_child.t_warehouse = target_warehouse
 	se_child.serial_no=serial_no
+	se_child.allow_zero_valuation_rate=1
 	# in stock uom
 	se_child.conversion_factor = flt(get_conversion_factor(item_code, details.stock_uom).get("conversion_factor") or 1.0)
 	stock_entry.set_missing_values()

@@ -173,6 +173,19 @@ frappe.ui.form.on('Production Order CD', {
 }
 });
 frappe.ui.form.on("Production Order Consumable Item CT", {
+	item_code: function (frm, cdt, cdn) {
+		let row = locals[cdt][cdn]
+		if (row.item_code) {
+			frappe.call('khozama.khozama.doctype.production_order_cd.production_order_cd.get_item_default_warehouse', {
+				item_code: row.item_code,
+				company:frm.doc.company
+
+			}).then(r => {
+				console.log(r.message)
+				frappe.model.set_value(cdt, cdn, "warehouse", r.message);
+			})			
+		}
+	},
 	issued_qty: function (frm, cdt, cdn) {
 		let row = locals[cdt][cdn]
 		calculate_to_consume_qty(cdt, cdn,row)

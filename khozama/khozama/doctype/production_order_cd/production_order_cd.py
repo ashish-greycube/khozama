@@ -9,6 +9,7 @@ from frappe.utils import flt,getdate, nowdate
 from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
 from frappe.utils import get_link_to_form
 from erpnext.stock.get_item_details import get_conversion_factor
+from erpnext.stock.doctype.item.item import get_item_defaults
 
 class ProductionOrderCD(Document):
 	def validate(self):
@@ -114,7 +115,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'consumption_qty':item.consumable_planned_qty_1,
 						'issued_qty':0,
 						'to_consume_qty':item.consumable_planned_qty_1,
-						'finished_item_code':item.item_code
+						'finished_item_code':item.item_code,
+						'warehouse':get_item_defaults(item.consumable_item_code_1,source.company).get('default_warehouse')
 
 					})
 				
@@ -126,7 +128,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'consumption_qty':item.consumable_planned_qty_2,
 						'issued_qty':0,
 						'to_consume_qty':item.consumable_planned_qty_2,
-						'finished_item_code':item.item_code			
+						'finished_item_code':item.item_code,
+						'warehouse':get_item_defaults(item.consumable_item_code_2,source.company).get('default_warehouse')			
 					})
 
 				if item.consumable_item_code_3:
@@ -137,7 +140,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'consumption_qty':item.consumable_planned_qty_3,
 						'issued_qty':0,
 						'to_consume_qty':item.consumable_planned_qty_3,
-						'finished_item_code':item.item_code					
+						'finished_item_code':item.item_code,
+						'warehouse':get_item_defaults(item.consumable_item_code_3,source.company).get('default_warehouse')					
 					})
 
 				if item.consumable_item_code_4:
@@ -148,7 +152,8 @@ def make_production_order(source_name, target_doc=None, ignore_permissions=False
 						'consumption_qty':item.consumable_planned_qty_4,
 						'issued_qty':0,
 						'to_consume_qty':item.consumable_planned_qty_4,
-						'finished_item_code':item.item_code					
+						'finished_item_code':item.item_code,
+						'warehouse':get_item_defaults(item.consumable_item_code_4,source.company).get('default_warehouse')					
 					})										
 
 
@@ -264,3 +269,6 @@ def update_production_order(self,method):
 
 		
 
+@frappe.whitelist()
+def get_item_default_warehouse(item_code,company):
+	return get_item_defaults(item_code,company).get('default_warehouse')
