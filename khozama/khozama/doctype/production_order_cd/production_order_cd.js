@@ -132,8 +132,8 @@ frappe.ui.form.on('Production Order CD', {
 						let calculated_consumption_qty=row.to_consume_qty+row.issued_qty		
 						if (calculated_consumption_qty < row.issued_qty){
 							frappe.throw({
-								title: __(" To Consume qty is zero"),
-								message: __('Item Code: {0} has entered consume qty {1}. <br>For which calcuated consumption qty(to_consume_qty+issued_qty) is <b>{2} </b>, hence cannot create material issue. <br>It should be greater than issued qty {3}', 
+								title: __(" Incorrect calculated consumption qty"),
+								message: __('Item Code: {0} has entered consume qty {1}. <br>Hence calcuated consumption qty(to_consume_qty [{1}]+issued_qty [{3}]) is <b>{2} </b>,so cannot create material issue. <br>calcuated consumption qty should be greater than issued qty {3}', 
 								[row.item_code, row.to_consume_qty,calculated_consumption_qty,row.issued_qty]),
 								indicator: 'red'
 							});	
