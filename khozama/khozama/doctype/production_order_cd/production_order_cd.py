@@ -91,6 +91,9 @@ class ProductionOrderCD(Document):
 
 @frappe.whitelist()
 def make_production_order(source_name, target_doc=None, ignore_permissions=False):
+	connected_so_count=frappe.db.count('Production Order CD', {'so_reference': 'source_name'})
+	if connected_so_count>1:
+		frappe.throw(_("Only single Production Order can be connected with a Sales Order"))
 	target_consumable_items=[]
 	def check_and_add_consumable_item(item_code=None,item_name=None,planned_qty=None,company=None):
 		found=False
