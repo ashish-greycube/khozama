@@ -76,9 +76,26 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Report",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "Consumed Item Profit Loss Report",
+   "link_to": "Consumed Item Profit Loss Report",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-03-14 07:59:24.700859",
+ "modified": "2024-05-03 13:22:09.774562",
  "modified_by": "Administrator",
  "module": "Khozama",
  "name": "Khozama",
