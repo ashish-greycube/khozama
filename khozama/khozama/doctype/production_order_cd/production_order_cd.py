@@ -56,7 +56,7 @@ class ProductionOrderCD(Document):
 		list_of_finished_items=[]
 		for finished_item in self.get('finished_items'):
 			if finished_item.item_code in list_of_finished_items:
-				frappe.throw(_("Duplicate Finished Item {0}.").format(item.finished_item_code))
+				frappe.throw(_("Duplicate Finished Item {0}.").format(finished_item.item_code))
 			else:
 				list_of_finished_items.append(finished_item.item_code)
 
